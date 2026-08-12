@@ -1,4 +1,4 @@
-import axios from "axios";
+import http from "../../lib/http";
 import React, { useEffect, useState } from "react";
 import { useSnackbar } from "../SnackBar";
 import { redirect, useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ function LoginSection() {
   const {showSnackbar}=useSnackbar()
   const [loading,setLoading]=useState()
   const navigate= useNavigate()
-  const baseURL=process.env.REACT_APP_BACKEND_URL
+  const baseURL=import.meta.env.VITE_BACKEND_URL
   useEffect(()=>{
     
   },[])
@@ -26,7 +26,7 @@ function LoginSection() {
       password:data.password
     }
     setLoading(true)
-    axios.post(`${baseURL}/auth/login`,loginPayload,{withCredentials:true}).then((resp)=>{
+    http.post(`${baseURL}/auth/login`,loginPayload).then((resp)=>{
       if(resp.status===401){
         showSnackbar({message:'Invalid Credentials',useCase:'error'})
         setLoading(false)

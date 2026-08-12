@@ -1,4 +1,4 @@
-import axios from 'axios'
+import http from '../../lib/http'
 import React from 'react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -8,7 +8,7 @@ function Logout(props) {
     const {} = props
     const navigate= useNavigate()
     useEffect(()=>{
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/auth/logout`,{withCredentials: true}).then((resp)=>{
+        http.get(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`).then((resp)=>{
                 if(resp.status===200){
                     navigate('/login')
                     localStorage.removeItem("role");

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../Navbar/Navbar'
 import { useSnackbar } from '../SnackBar';
-import axios from 'axios';
+import http from '../../lib/http';
 import Card from '../Requests/Card';
 import NoneToSHow from '../NoneToSHow';
 
@@ -13,16 +13,12 @@ function ReqLogs() {
     useEffect(() => {
       fetchReqs();
     }, []);
-    const baseURL = process.env.REACT_APP_BACKEND_URL;
+    const baseURL = import.meta.env.VITE_BACKEND_URL;
     function fetchReqs() {
       const role = localStorage.getItem("role");
-      const id = localStorage.getItem("id");
       setLoading(true)
-      axios
-        .get(`${baseURL}/${role}/myapprovedrequests`, {
-          withCredentials: true,
-          params: { id },
-        })
+      http
+        .get(`${baseURL}/${role}/myapprovedrequests`)
         .then((resp) => {
           // console.log(resp.data)
           const pending = resp.data.pendingRequests ?? [];
@@ -123,7 +119,7 @@ function ReqLogs() {
                   <Card
                     data={req}
                     view={view}
-                    key={req._id}
+                    key={req.id}
                     use="gsec"
                   />
                 );

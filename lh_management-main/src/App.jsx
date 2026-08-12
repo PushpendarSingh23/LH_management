@@ -1,29 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, redirect,useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import "./index.css";
 import Login from "./Pages/Login";
 import Request from "./Pages/Request";
 import BookLt from "./Pages/BookLt";
 import { SnackbarProvider } from "./Components/SnackBar";
-import axios from "axios";
+import http from "./lib/http";
 import Home from "./Components/Home/Home";
-import { Cookies, useCookies } from "react-cookie";
+import { useCookies } from "react-cookie";
 import Logout from "./Components/Logout/Logout";
 import ReqLogs from "./Components/RequestLog/ReqLogs";
 
-const auth= axios.create({
-  baseURL:process.env.REACT_APP_BACKEND_URL,
-  withCredentials: true
-})
-auth.interceptors.request.use((request)=>{
-  console.log(request)
-  // if(request.headers.cookie){
-  //   redirect('/login')
-  // }
-  return request
-},(error)=>{
-  return Promise.reject(error)
-})
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 function App() {
   const navigate = useNavigate()
   const cookie=useCookies()
@@ -31,7 +20,7 @@ function App() {
   const role=localStorage.getItem('role')
   const validateToken= async ()=>{
     try{
-      await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/user`,{withCredentials:true}).then((resp)=>{
+      await http.get(`${backendURL}/api/user`).then((resp)=>{
         if(resp.status===200){
           setAuth(true)
           if(localStorage){

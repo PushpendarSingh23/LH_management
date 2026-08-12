@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Card from "./Card";
-import axios from "axios";
+import http from "../../lib/http";
 import {  useSnackbar } from "../SnackBar";
 import NoneToSHow from "../NoneToSHow";
 
@@ -12,16 +12,12 @@ function LtReqs() {
   useEffect(() => {
     fetchReqs();
   }, []);
-  const baseURL = process.env.REACT_APP_BACKEND_URL;
+  const baseURL = import.meta.env.VITE_BACKEND_URL;
   function fetchReqs() {
     const role = localStorage.getItem("role");
-    const id = localStorage.getItem("id");
     setLoading(true)
-    axios
-      .get(`${baseURL}/${role}/allrequests`, {
-        withCredentials: true,
-        params: { id },
-      })
+    http
+      .get(`${baseURL}/${role}/allrequests`)
       .then((resp) => {
         // console.log(resp.data)
         const pending = resp.data.pendingRequests ?? [];
@@ -43,11 +39,10 @@ function LtReqs() {
   async function approveOrReject(action, id) {
     console.log(action, id);
 
-    await axios
+    await http
       .put(
         `${baseURL}/${role}/reviewed`,
-        { id, action },
-        { withCredentials: true }
+        { id, action }
       )
       .then((response) => {
         console.log(response);
@@ -148,7 +143,7 @@ function LtReqs() {
                   <Card
                     data={req}
                     view={view}
-                    key={req._id}
+                    key={req.id}
                     approveOrReject={approveOrReject}
                     use='notgsec'
                   />

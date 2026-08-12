@@ -1,29 +1,23 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt')
+const { pool } = require('../config/database');
 
-const userSchema = new mongoose.Schema({
-  name: { type: String},
-  password: { type: String, required: true },
-  email: {type: String, required: true},
-  role: { type: String, enum: ['systemAdministrator', 'assistantRegistrar', 'guard', 'facultyMentor', 'gsec'], required: true },
-  resetToken: String, 
-  resetTokenExpiration: Date,
-});
+const User = {
+  async findOne({ email }) {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    return result.rows[0] || null;
+  },
 
-// userSchema.pre('save', async function (next) {
-//   const user = this;
-//   if (user.isModified('password') || user.isNew) {
-//     const hashedPassword = await bcrypt.hash(user.password, 10);
-//     user.password = hashedPassword;
-//   }
-//   next();
-// });
+  async findById(id) {
+    const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    return result.rows[0] || null;
+  },
 
-// userSchema.methods.comparePassword = function (password) {
-//   return bcrypt.compare(password, this.password);
-// };
-
-
-const User = mongoose.model('User', userSchema);
+  async create({ name, email, password, role }) {
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name || null, email, password, role]
+    );
+    return result.rows[0];
+  },
+};
 
 module.exports = User;

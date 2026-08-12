@@ -1,9 +1,9 @@
 // middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
+const secretKey = require('../config/jwt');
 
 const authenticate = (req, res, next) => {
   const token = req.cookies.jwt;
-  secretKey = 'your-secret-key'
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }

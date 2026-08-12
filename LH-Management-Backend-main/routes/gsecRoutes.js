@@ -1,13 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const {authenticate, authorize} = require('../middlewares/authMiddlewares');
+const { authenticate, authorize } = require('../middlewares/authMiddlewares');
+const gsecController = require('../controllers/gsecController');
 
-const roleMiddleware = require('../middlewares/roleBasedMiddlewares')
-const gsecController = require('../controllers/gsecController')
+router.post('/makerequest', authenticate, authorize(['gsec']), gsecController.makeRequest);
+router.get('/myapprovedrequests', authenticate, authorize(['gsec']), gsecController.getAllRequestsByMe);
 
-
-router.post('/makerequest', authenticate, roleMiddleware(['gsec']), gsecController.makeRequest);
-router.get('/myapprovedrequests', authenticate, roleMiddleware(['gsec']), gsecController.getAllRequestsByMe);
-// router.get('/mypendingrequests', authenticate, roleMiddleware(['gsec']), gsecController.getPendingRequestsByMe);
-// router.get('/myrejectedrequests', authenticate, roleMiddleware(['gsec']), gsecController.getRejectedRequestsByMe);
-  module.exports = router;
+module.exports = router;

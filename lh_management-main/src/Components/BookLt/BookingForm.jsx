@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { lt, clubs, options } from "./data";
 import Datepicker from "tailwind-datepicker-react";
-import axios from "axios";
+import http from "../../lib/http";
 import { useSnackbar } from "../SnackBar";
 
 const Form = () => {
@@ -22,7 +22,7 @@ const Form = () => {
   const [show, setShow] = useState(false);
   const [showend, setShowEnd] = useState(false);
   const { showSnackbar } = useSnackbar();
-  const baseURL = process.env.REACT_APP_BACKEND_URL;
+  const baseURL = import.meta.env.VITE_BACKEND_URL;
 
   const handleStartChange = (selectedDate) => {
     setValue("startDate", selectedDate.toString());
@@ -47,17 +47,25 @@ const Form = () => {
   };
 
   const prepareBookingDetails = (data) => {
+    // The backend now derives who is booking (bookedBy) from the
+    // authenticated user's JWT, not from anything sent in the request body,
+    // so it isn't included here anymore -- sending it would just be ignored.
+    //
+    // facultyMentorEmail is looked up from the selected club instead of
+    // being a single hardcoded literal, since each club in `clubs` (see
+    // ./data.jsx) already carries its own facultyMentorEmail.
+    const selectedClub = clubs.find((club) => club.value === data.club);
+
     let bookingDetails = {
       ltNumber: data.lectureHall,
       startDate: new Date(data.startDate).toDateString(),
       endDate: new Date(data.endDate).toDateString(),
       reason: data.reason,
       clubName: data.club,
-      bookedBy: localStorage.getItem("email"),
       avSupport: data.av ? "yes" : "no",
       startTime: data.timeIn,
       endTime: data.timeOut,
-      facultyMentorEmail: "faculty@lnmiit.ac.in",
+      facultyMentorEmail: selectedClub?.facultyMentorEmail,
     };
 
     if (isAfterInTime) {
@@ -92,11 +100,10 @@ const Form = () => {
     }
 
     try {
-      axios
+      http
         .post(
           `${baseURL}/gsec/makerequest`,
-          { ...bookingDetails },
-          { withCredentials: true }
+          { ...bookingDetails }
         )
         .then((resp) => {
           if (resp.status === 200) {

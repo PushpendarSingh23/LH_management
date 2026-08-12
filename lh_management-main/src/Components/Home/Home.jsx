@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import axios from "axios";
+import http from "../../lib/http";
 import Footer from "../Footer/Footer";
 import BookedLtCard from "../HomePage/BookedLtCard";
 import Navbar from "../Navbar/Navbar";
@@ -9,13 +9,11 @@ import NoneToSHow from "../NoneToSHow";
 function Home() {
   const [approvedReq, setApprovedReqs] = useState();
   const [loading, setLoading] = useState(false);
-  // console.log(process.env.REACT_APP_BACKEND_URL+'/guard/approvedrequests')
+  // console.log(import.meta.env.VITE_BACKEND_URL+'/guard/approvedrequests')
   useEffect(() => {
     setLoading(true);
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_URL + "/guard/approvedrequests"}`, {
-        withCredentials: true,
-      })
+    http
+      .get(`${import.meta.env.VITE_BACKEND_URL + "/guard/approvedrequests"}`)
       .then((resp) => {
         setApprovedReqs(resp.data.approvedRequests);
         setLoading(false);
